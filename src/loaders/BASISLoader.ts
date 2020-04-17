@@ -16,6 +16,8 @@ declare class BasisFile {
     getImageHeight(imageId: number, level:number): number;
     getHasAlpha(): boolean;
     startTranscoding(): boolean;
+    close(): number;
+    delete(): number;
     getImageTranscodedSizeInBytes(imageId : number, level: number, basisFormat: number): number;
     transcodeImage(dstBuff: Uint8Array, imageId: number, level: number, basisFormat: number, pvrtcWrapAddressing: boolean, getAlphaForOpaqueFormats: boolean): number
 }
@@ -79,7 +81,8 @@ namespace pixi_compressed_textures {
 
         type = "BASIS";
 
-        private _file : BasisFile = undefined;
+        // private _file : BasisFile = undefined;
+        private _levelBufferSize:number;
 
         constructor(_image : CompressedImage) {
             super(_image);
@@ -190,15 +193,23 @@ namespace pixi_compressed_textures {
             console.log("[BASISLoader] Totla transcoding time:", performance.now() - startTime);
 
             this._format = target.native;
-            this._file = basisFile;
+            this._levelBufferSize = this._computeLevelBufferSize(basisFile, width, height, 0);
 
             let name = target.name.replace("COMPRESSED_", "");
 
+            //close basisFile after processed
+            // this._file = basisFile;
+            basisFile.close();
+            basisFile.delete();
             return Promise.resolve(dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native));
         }
 
+        _computeLevelBufferSize(_file:BasisFile, width : number, height: number, level: number): number {
+            return _file.getImageTranscodedSizeInBytes(0, level, FMT_TO_BASIS[this._format]);
+        }
+
         levelBufferSize(width : number, height: number, level: number): number {
-            return this._file ? this._file.getImageTranscodedSizeInBytes(0, level, FMT_TO_BASIS[this._format]) : undefined;
+            return this._levelBufferSize;
         }
     }
 }

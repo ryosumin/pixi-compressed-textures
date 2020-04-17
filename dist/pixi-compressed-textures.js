@@ -499,7 +499,6 @@ var pixi_compressed_textures;
         function BASISLoader(_image) {
             var _this = _super.call(this, _image) || this;
             _this.type = "BASIS";
-            _this._file = undefined;
             return _this;
         }
         BASISLoader.test = function (array) {
@@ -578,12 +577,17 @@ var pixi_compressed_textures;
             }
             console.log("[BASISLoader] Totla transcoding time:", performance.now() - startTime);
             this._format = target.native;
-            this._file = basisFile;
+            this._levelBufferSize = this._computeLevelBufferSize(basisFile, width, height, 0);
             var name = target.name.replace("COMPRESSED_", "");
+            basisFile.close();
+            basisFile.delete();
             return Promise.resolve(dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native));
         };
+        BASISLoader.prototype._computeLevelBufferSize = function (_file, width, height, level) {
+            return _file.getImageTranscodedSizeInBytes(0, level, FMT_TO_BASIS[this._format]);
+        };
         BASISLoader.prototype.levelBufferSize = function (width, height, level) {
-            return this._file ? this._file.getImageTranscodedSizeInBytes(0, level, FMT_TO_BASIS[this._format]) : undefined;
+            return this._levelBufferSize;
         };
         BASISLoader.BASIS_BINDING = undefined;
         return BASISLoader;

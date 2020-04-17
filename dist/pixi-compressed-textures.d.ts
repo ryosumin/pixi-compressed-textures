@@ -162,6 +162,8 @@ declare class BasisFile {
     getImageHeight(imageId: number, level: number): number;
     getHasAlpha(): boolean;
     startTranscoding(): boolean;
+    close(): number;
+    delete(): number;
     getImageTranscodedSizeInBytes(imageId: number, level: number, basisFormat: number): number;
     transcodeImage(dstBuff: Uint8Array, imageId: number, level: number, basisFormat: number, pvrtcWrapAddressing: boolean, getAlphaForOpaqueFormats: boolean): number;
 }
@@ -179,12 +181,13 @@ declare namespace PIXI.compressedTextures {
             native: number;
         };
         type: string;
-        private _file;
+        private _levelBufferSize;
         constructor(_image: CompressedImage);
         static test(array: ArrayBuffer): boolean;
         static bindTranscoder(fileCtr: typeof BasisFile, ext: any): void;
         load(buffer: ArrayBuffer): CompressedImage;
         _loadAsync(buffer: ArrayBuffer): any;
+        _computeLevelBufferSize(_file: BasisFile, width: number, height: number, level: number): number;
         levelBufferSize(width: number, height: number, level: number): number;
     }
 }
