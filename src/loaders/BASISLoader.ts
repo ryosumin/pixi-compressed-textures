@@ -3,8 +3,8 @@
 /**
  * @file BASISLoader - Basis implementation for PIXI
  * @see https://github.com/BinomialLLC/basis_universal
- * 
- * @author Timoshenko Konstantin 
+ *
+ * @author Timoshenko Konstantin
  * @see https://github.com/exponenta
  */
 
@@ -24,7 +24,7 @@ namespace pixi_compressed_textures {
 
     const BASIS_FORMAT = {
         cTFETC1: 0, // not support alpha
-        // cTFETC2: 1, // not WebGL
+        cTFETC2: 1, // not WebGL
         cTFBC1: 2, // not support alpha
         cTFBC3: 3,
         // cTFBC4: 4, // not WebGL
@@ -46,6 +46,7 @@ namespace pixi_compressed_textures {
 
     const NON_COMPRESSED = -1;
     const COMPRESSED_RGB_ETC1_WEBGL = 0x8D64;
+    const COMPRESSED_RGBA8_ETC2_EAC = 0x9278;
     const COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
     const COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
     const COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
@@ -58,6 +59,7 @@ namespace pixi_compressed_textures {
         // fallback
         [BASIS_FORMAT.cTFRGBA32]: NON_COMPRESSED,
         [BASIS_FORMAT.cTFETC1]: COMPRESSED_RGB_ETC1_WEBGL,
+        [BASIS_FORMAT.cTFETC2]: COMPRESSED_RGBA8_ETC2_EAC,
         [BASIS_FORMAT.cTFBC1]: COMPRESSED_RGB_S3TC_DXT1_EXT,
         [BASIS_FORMAT.cTFBC3]: COMPRESSED_RGBA_S3TC_DXT5_EXT,
         [BASIS_FORMAT.cTFPVRTC1_4_RGB]: COMPRESSED_RGB_PVRTC_4BPPV1_IMG,
@@ -70,7 +72,7 @@ namespace pixi_compressed_textures {
         return acc;
     }, {} as {[key: number]: number});
 
-    export class BASISLoader extends AbstractInternalLoader {        
+    export class BASISLoader extends AbstractInternalLoader {
         static BASIS_BINDING: typeof BasisFile = undefined;
         static RGB_FORMAT: {basis: number, name: string, native: number};
         static RGBA_FORMAT: {basis: number, name: string, native: number};
@@ -84,7 +86,7 @@ namespace pixi_compressed_textures {
         }
 
         static test(array: ArrayBuffer) {
-            const header = new Uint32Array(array, 0, 1)[0];      
+            const header = new Uint32Array(array, 0, 1)[0];
             const decoder = !!BASISLoader.BASIS_BINDING;
             const isValid = header === 0x134273 && decoder;
             const isSupported = BASISLoader.RGB_FORMAT && BASISLoader.RGBA_FORMAT;
@@ -98,7 +100,7 @@ namespace pixi_compressed_textures {
 
         /**
          * Binding BASIS Transcoder to loader
-         * 
+         *
          * @param fileCtr BASIS File contreuctor
          * @param ext supported extension, grub it from `app.renderer.plugins.texture.compressedExtensions`
          */
@@ -111,8 +113,8 @@ namespace pixi_compressed_textures {
             const plain = Object.keys(ext)
                 .reduce((acc, key) => {
                     const val = ext [key];
-                    if (!val) { 
-                        return acc; 
+                    if (!val) {
+                        return acc;
                     };
                     return Object.assign(acc, val.__proto__);
                 }, {});
@@ -151,7 +153,7 @@ namespace pixi_compressed_textures {
             RegisterCompressedExtensions('basis');
         }
 
-        load(buffer : ArrayBuffer) {            
+        load(buffer : ArrayBuffer) {
             if(!BASISLoader.test(buffer)) {
                 throw "BASIS Transcoder not binded or transcoding not supported =(!";
             }
@@ -160,7 +162,7 @@ namespace pixi_compressed_textures {
             return this._image;
         }
 
-        _loadAsync(buffer : ArrayBuffer) {            
+        _loadAsync(buffer : ArrayBuffer) {
             const startTime = performance.now();
             const BasisFileCtr = BASISLoader.BASIS_BINDING as any;
             const basisFile = new BasisFileCtr(new Uint8Array(buffer)) as BasisFile;
@@ -180,13 +182,13 @@ namespace pixi_compressed_textures {
             console.log("Grats! BASIS will be transcoded to:", target);
 
             const dst = new Uint8Array(basisFile.getImageTranscodedSizeInBytes(0, 0, target.basis));
-          
+
             if (!basisFile.transcodeImage(dst, 0, 0, target.basis, !!0, !!0)) {
                 throw "Transcoding error!";
             }
 
             console.log("[BASISLoader] Totla transcoding time:", performance.now() - startTime);
-           
+
             this._format = target.native;
             this._file = basisFile;
 

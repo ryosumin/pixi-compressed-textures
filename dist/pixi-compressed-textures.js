@@ -456,6 +456,7 @@ var pixi_compressed_textures;
     var _a, _b;
     var BASIS_FORMAT = {
         cTFETC1: 0,
+        cTFETC2: 1,
         cTFBC1: 2,
         cTFBC3: 3,
         cTFPVRTC1_4_RGB: 8,
@@ -471,6 +472,7 @@ var pixi_compressed_textures;
         _a);
     var NON_COMPRESSED = -1;
     var COMPRESSED_RGB_ETC1_WEBGL = 0x8D64;
+    var COMPRESSED_RGBA8_ETC2_EAC = 0x9278;
     var COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
     var COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83F1;
     var COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83F2;
@@ -481,6 +483,7 @@ var pixi_compressed_textures;
     var BASIS_TO_FMT = (_b = {},
         _b[BASIS_FORMAT.cTFRGBA32] = NON_COMPRESSED,
         _b[BASIS_FORMAT.cTFETC1] = COMPRESSED_RGB_ETC1_WEBGL,
+        _b[BASIS_FORMAT.cTFETC2] = COMPRESSED_RGBA8_ETC2_EAC,
         _b[BASIS_FORMAT.cTFBC1] = COMPRESSED_RGB_S3TC_DXT1_EXT,
         _b[BASIS_FORMAT.cTFBC3] = COMPRESSED_RGBA_S3TC_DXT5_EXT,
         _b[BASIS_FORMAT.cTFPVRTC1_4_RGB] = COMPRESSED_RGB_PVRTC_4BPPV1_IMG,
@@ -666,7 +669,8 @@ var pixi_compressed_textures;
                 pvrtc: (gl.getExtension("WEBGL_compressed_texture_pvrtc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc")),
                 astc: gl.getExtension("WEBGL_compressed_texture_astc"),
                 atc: gl.getExtension("WEBGL_compressed_texture_atc"),
-                etc1: gl.getExtension("WEBGL_compressed_texture_etc1")
+                etc1: gl.getExtension("WEBGL_compressed_texture_etc1"),
+                etc2: gl.getExtension('WEBGL_compressed_texture_etc')
             };
             this.compressedExtensions.crn = this.compressedExtensions.dxt;
         }

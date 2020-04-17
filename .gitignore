@@ -19,6 +19,7 @@ npm-debug.log
 \#*#
 
 # project ignores
+*.lock
 !.gitkeep
 *__temp
 node_modules

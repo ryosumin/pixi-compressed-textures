@@ -31,7 +31,8 @@ namespace pixi_compressed_textures {
 				pvrtc: (gl.getExtension("WEBGL_compressed_texture_pvrtc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc")), // 09-21-2019 -- IOS require it
 				astc: gl.getExtension("WEBGL_compressed_texture_astc"),
 				atc: gl.getExtension("WEBGL_compressed_texture_atc"),
-				etc1: gl.getExtension("WEBGL_compressed_texture_etc1")
+				etc1: gl.getExtension("WEBGL_compressed_texture_etc1"),
+				etc2: gl.getExtension('WEBGL_compressed_texture_etc')
 			};
 			this.compressedExtensions.crn = this.compressedExtensions.dxt;
 		}
