@@ -137,7 +137,7 @@ declare namespace PIXI.compressedTextures {
         protected _format: number;
         constructor(_image?: CompressedImage);
         abstract levelBufferSize(width: number, height: number, mipLevel?: number): number;
-        abstract load(buffer: ArrayBuffer): void;
+        abstract load(buffer: ArrayBuffer): Promise<any>;
         free(): void;
         static test(arrayBuffer: ArrayBuffer): boolean;
     }
@@ -184,7 +184,7 @@ declare namespace PIXI.compressedTextures {
         constructor(_image: CompressedImage);
         static test(array: ArrayBuffer): boolean;
         static bindTranscoder(fileCtr: typeof BasisFile, ext: any): void;
-        load(buffer: ArrayBuffer): void;
+        load(buffer: ArrayBuffer): Promise<void>;
         _loadAsync(buffer: ArrayBuffer): void;
         _computeLevelBufferSize(_file: BasisFile, width: number, height: number, level: number): number;
         levelBufferSize(width: number, height: number, level: number): number;

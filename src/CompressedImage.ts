@@ -19,7 +19,7 @@ namespace pixi_compressed_textures {
 
         constructor(src: string, data?: Uint8Array, type?: string, width?: number, height?: number, levels?: number, internalFormat?: number) {
             super();
-            this.init(src, data, type, width, height, levels, internalFormat)
+            // this.init(src, data, type, width, height, levels, internalFormat)
         }
 
         init(src: string, data: Uint8Array, type: string, width: number = -1, height: number = -1, levels: number, internalFormat: number): CompressedImage {
@@ -186,7 +186,7 @@ namespace pixi_compressed_textures {
             //todo: implement onload
             if (selectedLoaderCtr){
                 this._internalLoader = new selectedLoaderCtr(this);
-                return await this._internalLoader.load(arrayBuffer);
+                await this._internalLoader.load(arrayBuffer);
             } else {
                 throw new Error("Compressed texture format is not recognized: " + this.src);
             }

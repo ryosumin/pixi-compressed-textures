@@ -30,7 +30,7 @@ namespace pixi_compressed_textures {
          *
          * @param buffer
          */
-        public abstract load(buffer: ArrayBuffer): void;
+        public abstract load(buffer: ArrayBuffer): Promise<any>;
 
         /**
          * Free internals buffers

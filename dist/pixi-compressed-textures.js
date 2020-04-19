@@ -58,7 +58,6 @@ var pixi_compressed_textures;
             _this.preserveSource = true;
             _this.onload = null;
             _this.baseTexture = null;
-            _this.init(src, data, type, width, height, levels, internalFormat);
             return _this;
         }
         CompressedImage.prototype.init = function (src, data, type, width, height, levels, internalFormat) {
@@ -177,8 +176,11 @@ var pixi_compressed_textures;
                             if (!selectedLoaderCtr) return [3, 2];
                             this._internalLoader = new selectedLoaderCtr(this);
                             return [4, this._internalLoader.load(arrayBuffer)];
-                        case 1: return [2, _a.sent()];
+                        case 1:
+                            _a.sent();
+                            return [3, 3];
                         case 2: throw new Error("Compressed texture format is not recognized: " + this.src);
+                        case 3: return [2];
                     }
                 });
             });
@@ -604,10 +606,20 @@ var pixi_compressed_textures;
             pixi_compressed_textures.RegisterCompressedExtensions('basis');
         };
         BASISLoader.prototype.load = function (buffer) {
-            if (!BASISLoader.test(buffer)) {
-                throw "BASIS Transcoder not binded or transcoding not supported =(!";
-            }
-            this._loadAsync(buffer);
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!BASISLoader.test(buffer)) {
+                                throw "BASIS Transcoder not binded or transcoding not supported =(!";
+                            }
+                            return [4, this._loadAsync(buffer)];
+                        case 1:
+                            _a.sent();
+                            return [2];
+                    }
+                });
+            });
         };
         BASISLoader.prototype._loadAsync = function (buffer) {
             var startTime = performance.now();
@@ -823,10 +835,6 @@ var pixi_compressed_textures;
                             if (!resource.data) {
                                 throw new Error("compressedImageParser middleware for PixiJS v5 must be specified in loader.use()" +
                                     " and must have resource.data when completed");
-                            }
-                            if (resource.compressedImage) {
-                                next();
-                                return [2];
                             }
                             resource.compressedImage = new pixi_compressed_textures.CompressedImage(resource.url);
                             return [4, resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn')];

@@ -36,11 +36,11 @@ namespace pixi_compressed_textures {
                 throw new Error("compressedImageParser middleware for PixiJS v5 must be specified in loader.use()" +
                     " and must have resource.data when completed");
             }
-            if (resource.compressedImage) {
-                // ImageParser was added twice! ignore it.
-                next();
-                return;
-            }
+            // if (resource.compressedImage) {
+            //     // ImageParser was added twice! ignore it.
+            //     next();
+            //     return;
+            // }
             resource.compressedImage = new CompressedImage(resource.url);
             await resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn');
             resource.isCompressedImage = true;

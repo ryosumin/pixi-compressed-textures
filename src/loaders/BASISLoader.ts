@@ -156,12 +156,12 @@ namespace pixi_compressed_textures {
             RegisterCompressedExtensions('basis');
         }
 
-        load(buffer : ArrayBuffer) {
+        async load(buffer : ArrayBuffer) {
             if(!BASISLoader.test(buffer)) {
                 throw "BASIS Transcoder not binded or transcoding not supported =(!";
             }
 
-            this._loadAsync(buffer);
+            await this._loadAsync(buffer);
             // return this._image;
         }
 
