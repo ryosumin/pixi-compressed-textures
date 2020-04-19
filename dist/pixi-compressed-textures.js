@@ -1057,9 +1057,6 @@ var pixi_compressed_textures;
             };
             BasisWorker.prototype.transcode = function (buffer, options) {
                 var _this = this;
-                if (!this.free) {
-                    throw "[BASIS Worker " + this.id + "] Is busy! Check '.free' status!";
-                }
                 if (!buffer
                     || options.rgbaFormat === undefined
                     || options.rgbFormat === undefined) {
@@ -1070,7 +1067,6 @@ var pixi_compressed_textures;
                     rgbFormat: options.rgbFormat,
                     genMip: options.genMip || false
                 };
-                this.free = false;
                 return new Promise(function (res, rej) {
                     _this._rej = rej;
                     _this._res = res;
@@ -1143,35 +1139,61 @@ var pixi_compressed_textures;
                     return _this;
                 });
             };
-            TranscoderWorkerPool.prototype.transcode = function (buffer, options) {
-                if (!this.workers || !this.workers.length) {
-                    throw "[TranscoderWorkerPool] Pool empty, populate before!";
-                }
-                var workers = this.workers;
-                var freeWorker = undefined;
-                var iteration = 0;
-                var search = function (doneCallback) {
-                    for (var _i = 0, workers_1 = workers; _i < workers_1.length; _i++) {
-                        var w = workers_1[_i];
-                        if (w.free) {
-                            freeWorker = w;
-                            break;
+            TranscoderWorkerPool.prototype._delay = function (s) {
+                if (s === void 0) { s = 0; }
+                return __awaiter(this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        return [2, new Promise(function (resolve, reject) {
+                                setTimeout(resolve, s);
+                            })];
+                    });
+                });
+            };
+            TranscoderWorkerPool.prototype._searchWorker = function () {
+                return __awaiter(this, void 0, void 0, function () {
+                    var workers, freeWorker, _i, workers_1, w;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                workers = this.workers;
+                                freeWorker = undefined;
+                                _a.label = 1;
+                            case 1:
+                                if (!!freeWorker) return [3, 3];
+                                console.log("Search Worker....");
+                                for (_i = 0, workers_1 = workers; _i < workers_1.length; _i++) {
+                                    w = workers_1[_i];
+                                    if (w.free) {
+                                        freeWorker = w;
+                                        w.free = false;
+                                        break;
+                                    }
+                                }
+                                return [4, this._delay(100)];
+                            case 2:
+                                _a.sent();
+                                return [3, 1];
+                            case 3: return [2, freeWorker];
                         }
-                    }
-                    if (iteration > 100) {
-                        throw "[TranscoderWorkerPool] Can't found free worker after 100 interation!";
-                    }
-                    if (!freeWorker) {
-                        setTimeout(function () { return search(doneCallback); }, 10 * iteration);
-                    }
-                    else {
-                        doneCallback(freeWorker);
-                    }
-                    iteration++;
-                };
-                return new Promise(search).then(function (worker) {
-                    console.log("[TranscoderWorkerPool] run transcoding on " + worker.id + " worker");
-                    return worker.transcode(buffer, options);
+                    });
+                });
+            };
+            TranscoderWorkerPool.prototype.transcode = function (buffer, options) {
+                return __awaiter(this, void 0, void 0, function () {
+                    var worker;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!this.workers || !this.workers.length) {
+                                    throw "[TranscoderWorkerPool] Pool empty, populate before!";
+                                }
+                                return [4, this._searchWorker()];
+                            case 1:
+                                worker = _a.sent();
+                                console.log("[TranscoderWorkerPool] run transcoding on " + worker.id + " worker");
+                                return [2, worker.transcode(buffer, options)];
+                        }
+                    });
                 });
             };
             TranscoderWorkerPool.prototype.destroy = function () {

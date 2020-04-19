@@ -59,11 +59,11 @@ namespace pixi_compressed_textures.WorkedBASIS {
             if(this.initDone) {
                 return Promise.resolve(true);
             }
-            
+
             console.log(`[BASIS Worker ${this.id}] init start!`);
 
             this.worker.addEventListener("message", this._onMessage.bind(this));
-            this.worker.addEventListener("error", this._onError.bind(this));        
+            this.worker.addEventListener("error", this._onError.bind(this));
             this.binary = basisBinary;
 
             const initStart = performance.now();
@@ -83,12 +83,12 @@ namespace pixi_compressed_textures.WorkedBASIS {
         }
 
         transcode(buffer: ArrayBuffer, options: ITranscodeOptions) {
-            if(!this.free) {
-                throw `[BASIS Worker ${this.id}] Is busy! Check '.free' status!`;
-            }
+            // if(!this.free) {
+            //     throw `[BASIS Worker ${this.id}] Is busy! Check '.free' status!`;
+            // }
 
-            if(!buffer 
-                || options.rgbaFormat === undefined 
+            if(!buffer
+                || options.rgbaFormat === undefined
                 || options.rgbFormat === undefined) {
                 throw "Buffer and formats requred!";
             }
@@ -99,7 +99,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
                 genMip : options.genMip || false
             };
 
-            this.free = false;
+            // this.free = false;
             return new Promise((res, rej) => {
                 this._rej = rej;
                 this._res = res;
@@ -152,8 +152,8 @@ namespace pixi_compressed_textures.WorkedBASIS {
 
     export class TranscoderWorkerPool {
         public workers: Array<BasisWorker> = [];
-        private count: number = 1; 
-        
+        private count: number = 1;
+
         constructor(count:number = 0){
             this.count = count || 1;
         }
@@ -176,43 +176,64 @@ namespace pixi_compressed_textures.WorkedBASIS {
                 return this;
             })
         }
+        async _delay(s:number = 0){
+          return new Promise(function(resolve,reject){
+           setTimeout(resolve,s);
+          });
+        }
 
-        transcode(buffer: ArrayBuffer, options: ITranscodeOptions) {
+        async _searchWorker(){
+          const workers = this.workers;
+
+          let freeWorker: BasisWorker = undefined;
+          // let iteration = 0;
+          //
+          // const search = (doneCallback : (w: BasisWorker) => void) => {
+          //     for(let w of workers) {
+          //         if(w.free) {
+          //             freeWorker = w;
+          //             break;
+          //         }
+          //     }
+          //
+          //     if(iteration > 100) {
+          //         throw "[TranscoderWorkerPool] Can't found free worker after 100 interation!";
+          //     }
+          //
+          //     if(!freeWorker) {
+          //         setTimeout( () => search(doneCallback), 10 * iteration);
+          //     } else {
+          //         doneCallback(freeWorker);
+          //     }
+          //
+          //     iteration ++;
+          // }
+          while(!freeWorker){
+            console.log("Search Worker....");
+            for(let w of workers) {
+                if(w.free) {
+                    freeWorker = w;
+                    w.free = false;
+                    break;
+                }
+            }
+            await this._delay(100);
+          }
+          return freeWorker;
+        }
+        async transcode(buffer: ArrayBuffer, options: ITranscodeOptions) {
             if(!this.workers || !this.workers.length) {
                 throw "[TranscoderWorkerPool] Pool empty, populate before!";
             }
-            const workers = this.workers;
 
-            let freeWorker: BasisWorker = undefined;
-            let iteration = 0;
+            let worker: BasisWorker = await this._searchWorker();
+            // return new Promise(search).then( (worker) =>{
+            console.log(`[TranscoderWorkerPool] run transcoding on ${worker.id} worker`);
 
-            const search = (doneCallback : (w: BasisWorker) => void) => {
-                for(let w of workers) {
-                    if(w.free) {
-                        freeWorker = w;
-                        break;
-                    }
-                }
-
-                if(iteration > 100) {
-                    throw "[TranscoderWorkerPool] Can't found free worker after 100 interation!";
-                }
-    
-                if(!freeWorker) {
-                    setTimeout( () => search(doneCallback), 10 * iteration);
-                } else {
-                    doneCallback(freeWorker);
-                }
-
-                iteration ++;
-            }
-    
-            return new Promise(search).then( (worker) =>{    
-                console.log(`[TranscoderWorkerPool] run transcoding on ${worker.id} worker`);
-                return worker.transcode(buffer, options);
-            });
+            return worker.transcode(buffer, options);
+            // });
         }
-        
+
         destroy() {
             this.workers.forEach((w)=>{
                 w.destroy();

@@ -121,7 +121,9 @@ declare namespace PIXI.compressedTextures.WorkedBASIS {
         private count;
         constructor(count?: number);
         init(jsSource: string, wasmSource: ArrayBuffer): any;
-        transcode(buffer: ArrayBuffer, options: ITranscodeOptions): any;
+        _delay(s?: number): Promise<any>;
+        _searchWorker(): Promise<BasisWorker>;
+        transcode(buffer: ArrayBuffer, options: ITranscodeOptions): Promise<any>;
         destroy(): void;
     }
 }
@@ -236,7 +238,7 @@ declare namespace PIXI.compressedTextures {
     class WorkedBASISLoader extends BASISLoader {
         private _mips;
         constructor(_image: CompressedImage);
-        _loadAsync(buffer: ArrayBuffer): any;
+        _loadAsync(buffer: ArrayBuffer): Promise<void>;
         static loadAndRunTranscoder(options: {
             path: string;
             ext: any;
