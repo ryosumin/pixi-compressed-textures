@@ -21,7 +21,7 @@ namespace pixi_compressed_textures {
             };
             let self = this;
 
-              pool
+            return pool
                   .transcode(buffer, config)
                   .then( (result: ITranscodeResult ) =>
                   {

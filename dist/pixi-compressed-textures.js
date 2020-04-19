@@ -972,7 +972,7 @@ var pixi_compressed_textures;
                 transfer: true
             };
             var self = this;
-            pool
+            return pool
                 .transcode(buffer, config)
                 .then(function (result) {
                 var width = result.width;

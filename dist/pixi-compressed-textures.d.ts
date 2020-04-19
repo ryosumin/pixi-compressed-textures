@@ -236,7 +236,7 @@ declare namespace PIXI.compressedTextures {
     class WorkedBASISLoader extends BASISLoader {
         private _mips;
         constructor(_image: CompressedImage);
-        _loadAsync(buffer: ArrayBuffer): void;
+        _loadAsync(buffer: ArrayBuffer): any;
         static loadAndRunTranscoder(options: {
             path: string;
             ext: any;
