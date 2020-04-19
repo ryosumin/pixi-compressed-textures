@@ -162,7 +162,7 @@ namespace pixi_compressed_textures {
             }
 
             this._loadAsync(buffer);
-            return this._image;
+            // return this._image;
         }
 
         _loadAsync(buffer : ArrayBuffer) {
@@ -201,7 +201,7 @@ namespace pixi_compressed_textures {
             // this._file = basisFile;
             basisFile.close();
             basisFile.delete();
-            return Promise.resolve(dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native));
+            dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native);
         }
 
         _computeLevelBufferSize(_file:BasisFile, width : number, height: number, level: number): number {

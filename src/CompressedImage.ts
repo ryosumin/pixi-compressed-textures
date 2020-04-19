@@ -8,9 +8,11 @@ declare namespace PIXI {
 
 namespace pixi_compressed_textures {
 
-    export function loadFromArrayBuffer(arrayBuffer: ArrayBuffer, src: string, crnLoad?: boolean): CompressedImage {
-        return new CompressedImage(src).loadFromArrayBuffer(arrayBuffer, crnLoad);
-    }
+    // export function loadFromArrayBuffer(arrayBuffer: ArrayBuffer, src: string, crnLoad?: boolean): CompressedImage {
+    //     let img = new CompressedImage(src);
+    //     img.loadFromArrayBuffer(arrayBuffer, crnLoad);
+    //     return img;
+    // }
 
     export class CompressedImage extends PIXI.resources.Resource {
         private _internalLoader: AbstractInternalLoader;
@@ -84,7 +86,7 @@ namespace pixi_compressed_textures {
             }
 
             const levels = this.levels;
-            
+
             let width = this.width;
             let height = this.height;
             let offset = 0;
@@ -94,22 +96,22 @@ namespace pixi_compressed_textures {
 
             // Loop through each mip level of compressed texture data provided and upload it to the given texture.
             for (let i = 0; i < levels; ++i) {
-                
+
                 // Determine how big this level of compressed texture data is in bytes.
                 const levelSize = this._internalLoader.levelBufferSize(width, height, i);
-                
+
                 // Get a view of the bytes for this level of DXT data.
                 let dxtLevel = new Uint8Array(this.data.buffer, this.data.byteOffset + offset, levelSize);
 
                 // Upload!
                 gl.compressedTexImage2D(gl.TEXTURE_2D, i, this.internalFormat, width, height, 0, dxtLevel);
                 // The next mip level will be half the height and width of this one.
-                
+
                 width = width >> 1;
                 if (width < 1) {
                     width = 1;
                 }
-                
+
                 height = height >> 1;
                 if (height < 1) {
                     height = 1;
@@ -117,10 +119,10 @@ namespace pixi_compressed_textures {
                 // Advance the offset into the compressed texture data past the current mip level's data.
                 offset += levelSize;
             }
-            
+
             //clean internal loader data
             this._internalLoader.free();
-      
+
             // Cleaning the data to save memory. NOTE : BECAUSE OF THIS WE CANNOT CREATE TWO GL TEXTURE FROM THE SAME COMPRESSED IMAGE !
             if (!this.preserveSource)
                 this.data = null;
@@ -157,15 +159,15 @@ namespace pixi_compressed_textures {
             return true;
         }
 
-        loadFromArrayBuffer(arrayBuffer: ArrayBuffer, crnLoad?: boolean): CompressedImage {
+        async loadFromArrayBuffer(arrayBuffer: ArrayBuffer, crnLoad?: boolean): Promise<any> {
             const loaders = Loaders;
-            
+
             if(!loaders || !loaders.length) {
                 throw "Registered compressed loaders is missing. Call `TextureSystem.initCompressed` before loading!";
             }
 
             let selectedLoaderCtr = undefined;
-            
+
             for(let loader of loaders) {
                 if(!crnLoad) {
                     if(loader.test(arrayBuffer)) {
@@ -173,7 +175,7 @@ namespace pixi_compressed_textures {
                         break;
                     }
                 } else {
-                    /// so.... 
+                    /// so....
                     if(loader.type === "CRN"){
                         selectedLoaderCtr = loader;
                         break;
@@ -184,7 +186,7 @@ namespace pixi_compressed_textures {
             //todo: implement onload
             if (selectedLoaderCtr){
                 this._internalLoader = new selectedLoaderCtr(this);
-                return this._internalLoader.load(arrayBuffer);
+                return await this._internalLoader.load(arrayBuffer);
             } else {
                 throw new Error("Compressed texture format is not recognized: " + this.src);
             }

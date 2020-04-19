@@ -16,11 +16,11 @@ namespace pixi_compressed_textures {
                 TEXTURE_EXTENSIONS.push(exts[e]);
                 Resource.setExtensionXhrType(exts[e], Resource.XHR_RESPONSE_TYPE.BUFFER);
             }
-        }        
+        }
     }
 
     export class ImageParser {
-        static use(this: PIXI.Loader, resource: PIXI.LoaderResource, next: () => any) {
+        static async use(this: PIXI.Loader, resource: PIXI.LoaderResource, next: () => any) {
 
             const url = resource.url;
             const idx = url.lastIndexOf('.');
@@ -42,7 +42,7 @@ namespace pixi_compressed_textures {
                 return;
             }
             resource.compressedImage = new CompressedImage(resource.url);
-            resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn');
+            await resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn');
             resource.isCompressedImage = true;
             resource.texture = fromResource(resource.compressedImage, resource.url, resource.name);
             next();
@@ -76,7 +76,7 @@ namespace pixi_compressed_textures {
 
         return texture;
     }
-    
+
     RegisterCompressedExtensions('dds','crn','pvr','etc1','astc');
     PIXI.Loader.registerPlugin(ImageParser);
 }

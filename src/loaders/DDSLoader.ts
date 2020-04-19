@@ -75,7 +75,7 @@ namespace pixi_compressed_textures {
             super(_image);
         }
 
-        load(arrayBuffer: ArrayBuffer) {
+        async load(arrayBuffer: ArrayBuffer) {
             if (!DDSLoader.test(arrayBuffer)) {
                 // Do some sanity checks to make sure this is a valid ASTC file.
                 throw "Invalid magic number in DDS header";
@@ -111,7 +111,7 @@ namespace pixi_compressed_textures {
             this._format = internalFormat;
             dest.init(dest.src, dxtData, 'DDS', width, height, levels, internalFormat);
 
-            return dest;
+            // return dest;
         }
 
         static test(buffer: ArrayBuffer) {

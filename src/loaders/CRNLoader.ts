@@ -21,7 +21,7 @@ declare module CRN_Module {
 }
 
 namespace pixi_compressed_textures {
-    
+
     const CRN_Module = (window as any).CRN_Module;
 
     function arrayBufferCopy(src: Uint8Array, dst: Uint8Array, dstByteOffset: number, numBytes: number): void {
@@ -37,7 +37,7 @@ namespace pixi_compressed_textures {
         }
     }
 
-    
+
     // DXT formats, from:
     // http://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
     const COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83F0;
@@ -58,7 +58,7 @@ namespace pixi_compressed_textures {
             super(_image);
         }
 
-        load(arrayBuffer: ArrayBuffer) {
+        async load(arrayBuffer: ArrayBuffer) {
 
             const srcSize = arrayBuffer.byteLength;
             const bytes = new Uint8Array(arrayBuffer);
@@ -82,7 +82,7 @@ namespace pixi_compressed_textures {
             this._format = internalFormat;
             this._caches = [src, dst];
 
-            return dest.init(dest.src, dxtData, 'CRN', width, height, levels, internalFormat);
+            dest.init(dest.src, dxtData, 'CRN', width, height, levels, internalFormat);
         }
 
         levelBufferSize(width: number, height: number, mipLevel: number = 0): number {
@@ -93,7 +93,7 @@ namespace pixi_compressed_textures {
         free() {
             CRN_Module._free(this._caches[0]);
             CRN_Module._free(this._caches[1]);
-            
+
         }
 
         static test(buffer: ArrayBuffer) {

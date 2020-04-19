@@ -11,12 +11,44 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var pixi_compressed_textures;
 (function (pixi_compressed_textures) {
-    function loadFromArrayBuffer(arrayBuffer, src, crnLoad) {
-        return new CompressedImage(src).loadFromArrayBuffer(arrayBuffer, crnLoad);
-    }
-    pixi_compressed_textures.loadFromArrayBuffer = loadFromArrayBuffer;
     var CompressedImage = (function (_super) {
         __extends(CompressedImage, _super);
         function CompressedImage(src, data, type, width, height, levels, internalFormat) {
@@ -117,33 +149,39 @@ var pixi_compressed_textures;
             return true;
         };
         CompressedImage.prototype.loadFromArrayBuffer = function (arrayBuffer, crnLoad) {
-            var loaders = pixi_compressed_textures.Loaders;
-            if (!loaders || !loaders.length) {
-                throw "Registered compressed loaders is missing. Call `TextureSystem.initCompressed` before loading!";
-            }
-            var selectedLoaderCtr = undefined;
-            for (var _i = 0, loaders_1 = loaders; _i < loaders_1.length; _i++) {
-                var loader = loaders_1[_i];
-                if (!crnLoad) {
-                    if (loader.test(arrayBuffer)) {
-                        selectedLoaderCtr = loader;
-                        break;
+            return __awaiter(this, void 0, void 0, function () {
+                var loaders, selectedLoaderCtr, _i, loaders_1, loader;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            loaders = pixi_compressed_textures.Loaders;
+                            if (!loaders || !loaders.length) {
+                                throw "Registered compressed loaders is missing. Call `TextureSystem.initCompressed` before loading!";
+                            }
+                            selectedLoaderCtr = undefined;
+                            for (_i = 0, loaders_1 = loaders; _i < loaders_1.length; _i++) {
+                                loader = loaders_1[_i];
+                                if (!crnLoad) {
+                                    if (loader.test(arrayBuffer)) {
+                                        selectedLoaderCtr = loader;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    if (loader.type === "CRN") {
+                                        selectedLoaderCtr = loader;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!selectedLoaderCtr) return [3, 2];
+                            this._internalLoader = new selectedLoaderCtr(this);
+                            return [4, this._internalLoader.load(arrayBuffer)];
+                        case 1: return [2, _a.sent()];
+                        case 2: throw new Error("Compressed texture format is not recognized: " + this.src);
                     }
-                }
-                else {
-                    if (loader.type === "CRN") {
-                        selectedLoaderCtr = loader;
-                        break;
-                    }
-                }
-            }
-            if (selectedLoaderCtr) {
-                this._internalLoader = new selectedLoaderCtr(this);
-                return this._internalLoader.load(arrayBuffer);
-            }
-            else {
-                throw new Error("Compressed texture format is not recognized: " + this.src);
-            }
+                });
+            });
         };
         return CompressedImage;
     }(PIXI.resources.Resource));
@@ -231,22 +269,27 @@ var pixi_compressed_textures;
             return _this;
         }
         ASTCLoader.prototype.load = function (buffer) {
-            if (!ASTCLoader.test(buffer)) {
-                throw "Invalid magic number in ASTC header";
-            }
-            var header = new Uint8Array(buffer, 0, ASTC_HEADER_LENGTH);
-            var dim_x = header[ASTC_HEADER_DIM_X];
-            var dim_y = header[ASTC_HEADER_DIM_Y];
-            var width = (header[ASTC_HEADER_WIDTH]) + (header[ASTC_HEADER_WIDTH + 1] << 8) + (header[ASTC_HEADER_WIDTH + 2] << 16);
-            var height = (header[ASTC_HEADER_HEIGHT]) + (header[ASTC_HEADER_HEIGHT + 1] << 8) + (header[ASTC_HEADER_HEIGHT + 2] << 16);
-            var internalFormat = ASTC_DIMS_TO_FORMAT[dim_x * dim_y] + (this.useSRGB ? COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : COMPRESSED_RGBA_ASTC_4x4_KHR);
-            var astcData = new Uint8Array(buffer, ASTC_HEADER_LENGTH);
-            this._format = internalFormat;
-            this._blockSize.x = dim_x;
-            this._blockSize.y = dim_y;
-            var dest = this._image;
-            dest.init(dest.src, astcData, 'ASTC', width, height, 1, internalFormat);
-            return dest;
+            return __awaiter(this, void 0, void 0, function () {
+                var header, dim_x, dim_y, width, height, internalFormat, astcData, dest;
+                return __generator(this, function (_a) {
+                    if (!ASTCLoader.test(buffer)) {
+                        throw "Invalid magic number in ASTC header";
+                    }
+                    header = new Uint8Array(buffer, 0, ASTC_HEADER_LENGTH);
+                    dim_x = header[ASTC_HEADER_DIM_X];
+                    dim_y = header[ASTC_HEADER_DIM_Y];
+                    width = (header[ASTC_HEADER_WIDTH]) + (header[ASTC_HEADER_WIDTH + 1] << 8) + (header[ASTC_HEADER_WIDTH + 2] << 16);
+                    height = (header[ASTC_HEADER_HEIGHT]) + (header[ASTC_HEADER_HEIGHT + 1] << 8) + (header[ASTC_HEADER_HEIGHT + 2] << 16);
+                    internalFormat = ASTC_DIMS_TO_FORMAT[dim_x * dim_y] + (this.useSRGB ? COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : COMPRESSED_RGBA_ASTC_4x4_KHR);
+                    astcData = new Uint8Array(buffer, ASTC_HEADER_LENGTH);
+                    this._format = internalFormat;
+                    this._blockSize.x = dim_x;
+                    this._blockSize.y = dim_y;
+                    dest = this._image;
+                    dest.init(dest.src, astcData, 'ASTC', width, height, 1, internalFormat);
+                    return [2];
+                });
+            });
         };
         ASTCLoader.test = function (buffer) {
             var magic = new Int32Array(buffer, 0, 1);
@@ -315,29 +358,34 @@ var pixi_compressed_textures;
             return _super.call(this, _image) || this;
         }
         DDSLoader.prototype.load = function (arrayBuffer) {
-            if (!DDSLoader.test(arrayBuffer)) {
-                throw "Invalid magic number in DDS header";
-            }
-            var header = new Int32Array(arrayBuffer, 0, DDS_HEADER_LENGTH);
-            if (!(header[DDS_HEADER_PF_FLAGS] & DDPF_FOURCC))
-                throw "Unsupported format, must contain a FourCC code";
-            var fourCC = header[DDS_HEADER_PF_FOURCC];
-            var internalFormat = FOURCC_TO_FORMAT[fourCC] || -1;
-            if (internalFormat < 0) {
-                throw "Unsupported FourCC code: " + int32ToFourCC(fourCC);
-            }
-            var levels = 1;
-            if (header[DDS_HEADER_FLAGS] & DDSD_MIPMAPCOUNT) {
-                levels = Math.max(1, header[DDS_HEADER_MIPMAPCOUNT]);
-            }
-            var width = header[DDS_HEADER_WIDTH];
-            var height = header[DDS_HEADER_HEIGHT];
-            var dataOffset = header[DDS_HEADER_SIZE] + 4;
-            var dxtData = new Uint8Array(arrayBuffer, dataOffset);
-            var dest = this._image;
-            this._format = internalFormat;
-            dest.init(dest.src, dxtData, 'DDS', width, height, levels, internalFormat);
-            return dest;
+            return __awaiter(this, void 0, void 0, function () {
+                var header, fourCC, internalFormat, levels, width, height, dataOffset, dxtData, dest;
+                return __generator(this, function (_a) {
+                    if (!DDSLoader.test(arrayBuffer)) {
+                        throw "Invalid magic number in DDS header";
+                    }
+                    header = new Int32Array(arrayBuffer, 0, DDS_HEADER_LENGTH);
+                    if (!(header[DDS_HEADER_PF_FLAGS] & DDPF_FOURCC))
+                        throw "Unsupported format, must contain a FourCC code";
+                    fourCC = header[DDS_HEADER_PF_FOURCC];
+                    internalFormat = FOURCC_TO_FORMAT[fourCC] || -1;
+                    if (internalFormat < 0) {
+                        throw "Unsupported FourCC code: " + int32ToFourCC(fourCC);
+                    }
+                    levels = 1;
+                    if (header[DDS_HEADER_FLAGS] & DDSD_MIPMAPCOUNT) {
+                        levels = Math.max(1, header[DDS_HEADER_MIPMAPCOUNT]);
+                    }
+                    width = header[DDS_HEADER_WIDTH];
+                    height = header[DDS_HEADER_HEIGHT];
+                    dataOffset = header[DDS_HEADER_SIZE] + 4;
+                    dxtData = new Uint8Array(arrayBuffer, dataOffset);
+                    dest = this._image;
+                    this._format = internalFormat;
+                    dest.init(dest.src, dxtData, 'DDS', width, height, levels, internalFormat);
+                    return [2];
+                });
+            });
         };
         DDSLoader.test = function (buffer) {
             var magic = new Int32Array(buffer, 0, 1);
@@ -407,21 +455,26 @@ var pixi_compressed_textures;
             return _super.call(this, _image) || this;
         }
         PVRTCLoader.prototype.load = function (arrayBuffer) {
-            if (!PVRTCLoader.test(arrayBuffer)) {
-                throw "Invalid magic number in PVR header";
-            }
-            var header = new Int32Array(arrayBuffer, 0, PVR_HEADER_LENGTH);
-            var format = header[PVR_HEADER_FORMAT];
-            var internalFormat = PVR_TO_FORMAT[format] || -1;
-            var width = header[PVR_HEADER_WIDTH];
-            var height = header[PVR_HEADER_HEIGHT];
-            var levels = header[PVR_HEADER_MIPMAPCOUNT];
-            var dataOffset = header[PVR_HEADER_METADATA] + 52;
-            var pvrtcData = new Uint8Array(arrayBuffer, dataOffset);
-            var dest = this._image;
-            this._format = internalFormat;
-            dest.init(dest.src, pvrtcData, 'PVR', width, height, levels, internalFormat);
-            return dest;
+            return __awaiter(this, void 0, void 0, function () {
+                var header, format, internalFormat, width, height, levels, dataOffset, pvrtcData, dest;
+                return __generator(this, function (_a) {
+                    if (!PVRTCLoader.test(arrayBuffer)) {
+                        throw "Invalid magic number in PVR header";
+                    }
+                    header = new Int32Array(arrayBuffer, 0, PVR_HEADER_LENGTH);
+                    format = header[PVR_HEADER_FORMAT];
+                    internalFormat = PVR_TO_FORMAT[format] || -1;
+                    width = header[PVR_HEADER_WIDTH];
+                    height = header[PVR_HEADER_HEIGHT];
+                    levels = header[PVR_HEADER_MIPMAPCOUNT];
+                    dataOffset = header[PVR_HEADER_METADATA] + 52;
+                    pvrtcData = new Uint8Array(arrayBuffer, dataOffset);
+                    dest = this._image;
+                    this._format = internalFormat;
+                    dest.init(dest.src, pvrtcData, 'PVR', width, height, levels, internalFormat);
+                    return [2];
+                });
+            });
         };
         PVRTCLoader.test = function (buffer) {
             var magic = new Int32Array(buffer, 0, 1);
@@ -555,7 +608,6 @@ var pixi_compressed_textures;
                 throw "BASIS Transcoder not binded or transcoding not supported =(!";
             }
             this._loadAsync(buffer);
-            return this._image;
         };
         BASISLoader.prototype._loadAsync = function (buffer) {
             var startTime = performance.now();
@@ -581,7 +633,7 @@ var pixi_compressed_textures;
             var name = target.name.replace("COMPRESSED_", "");
             basisFile.close();
             basisFile.delete();
-            return Promise.resolve(dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native));
+            dest.init(dest.src, dst, 'BASIS|' + name, width, height, levels, target.native);
         };
         BASISLoader.prototype._computeLevelBufferSize = function (_file, width, height, level) {
             return _file.getImageTranscodedSizeInBytes(0, level, FMT_TO_BASIS[this._format]);
@@ -623,23 +675,29 @@ var pixi_compressed_textures;
             return _super.call(this, _image) || this;
         }
         CRNLoader.prototype.load = function (arrayBuffer) {
-            var srcSize = arrayBuffer.byteLength;
-            var bytes = new Uint8Array(arrayBuffer);
-            var src = CRN_Module._malloc(srcSize);
-            arrayBufferCopy(bytes, CRN_Module.HEAPU8, src, srcSize);
-            var width = CRN_Module._crn_get_width(src, srcSize);
-            var height = CRN_Module._crn_get_height(src, srcSize);
-            var levels = CRN_Module._crn_get_levels(src, srcSize);
-            var format = CRN_Module._crn_get_dxt_format(src, srcSize);
-            var dstSize = CRN_Module._crn_get_uncompressed_size(src, srcSize, 0);
-            var dst = CRN_Module._malloc(dstSize);
-            CRN_Module._crn_decompress(src, srcSize, dst, dstSize, 0);
-            var dxtData = new Uint8Array(CRN_Module.HEAPU8.buffer, dst, dstSize);
-            var internalFormat = DXT_FORMAT_MAP[format];
-            var dest = this._image;
-            this._format = internalFormat;
-            this._caches = [src, dst];
-            return dest.init(dest.src, dxtData, 'CRN', width, height, levels, internalFormat);
+            return __awaiter(this, void 0, void 0, function () {
+                var srcSize, bytes, src, width, height, levels, format, dstSize, dst, dxtData, internalFormat, dest;
+                return __generator(this, function (_a) {
+                    srcSize = arrayBuffer.byteLength;
+                    bytes = new Uint8Array(arrayBuffer);
+                    src = CRN_Module._malloc(srcSize);
+                    arrayBufferCopy(bytes, CRN_Module.HEAPU8, src, srcSize);
+                    width = CRN_Module._crn_get_width(src, srcSize);
+                    height = CRN_Module._crn_get_height(src, srcSize);
+                    levels = CRN_Module._crn_get_levels(src, srcSize);
+                    format = CRN_Module._crn_get_dxt_format(src, srcSize);
+                    dstSize = CRN_Module._crn_get_uncompressed_size(src, srcSize, 0);
+                    dst = CRN_Module._malloc(dstSize);
+                    CRN_Module._crn_decompress(src, srcSize, dst, dstSize, 0);
+                    dxtData = new Uint8Array(CRN_Module.HEAPU8.buffer, dst, dstSize);
+                    internalFormat = DXT_FORMAT_MAP[format];
+                    dest = this._image;
+                    this._format = internalFormat;
+                    this._caches = [src, dst];
+                    dest.init(dest.src, dxtData, 'CRN', width, height, levels, internalFormat);
+                    return [2];
+                });
+            });
         };
         CRNLoader.prototype.levelBufferSize = function (width, height, mipLevel) {
             if (mipLevel === void 0) { mipLevel = 0; }
@@ -749,27 +807,38 @@ var pixi_compressed_textures;
         function ImageParser() {
         }
         ImageParser.use = function (resource, next) {
-            var url = resource.url;
-            var idx = url.lastIndexOf('.');
-            var amper = url.lastIndexOf('?');
-            var ext = url.substring(idx + 1, amper > 0 ? amper : url.length);
-            if (pixi_compressed_textures.TEXTURE_EXTENSIONS.indexOf(ext) < 0) {
-                next();
-                return;
-            }
-            if (!resource.data) {
-                throw new Error("compressedImageParser middleware for PixiJS v5 must be specified in loader.use()" +
-                    " and must have resource.data when completed");
-            }
-            if (resource.compressedImage) {
-                next();
-                return;
-            }
-            resource.compressedImage = new pixi_compressed_textures.CompressedImage(resource.url);
-            resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn');
-            resource.isCompressedImage = true;
-            resource.texture = fromResource(resource.compressedImage, resource.url, resource.name);
-            next();
+            return __awaiter(this, void 0, void 0, function () {
+                var url, idx, amper, ext;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            url = resource.url;
+                            idx = url.lastIndexOf('.');
+                            amper = url.lastIndexOf('?');
+                            ext = url.substring(idx + 1, amper > 0 ? amper : url.length);
+                            if (pixi_compressed_textures.TEXTURE_EXTENSIONS.indexOf(ext) < 0) {
+                                next();
+                                return [2];
+                            }
+                            if (!resource.data) {
+                                throw new Error("compressedImageParser middleware for PixiJS v5 must be specified in loader.use()" +
+                                    " and must have resource.data when completed");
+                            }
+                            if (resource.compressedImage) {
+                                next();
+                                return [2];
+                            }
+                            resource.compressedImage = new pixi_compressed_textures.CompressedImage(resource.url);
+                            return [4, resource.compressedImage.loadFromArrayBuffer(resource.data, ext === 'crn')];
+                        case 1:
+                            _a.sent();
+                            resource.isCompressedImage = true;
+                            resource.texture = fromResource(resource.compressedImage, resource.url, resource.name);
+                            next();
+                            return [2];
+                    }
+                });
+            });
         };
         return ImageParser;
     }());
@@ -894,7 +963,8 @@ var pixi_compressed_textures;
                 rgbFormat: pixi_compressed_textures.BASISLoader.RGB_FORMAT.basis,
                 transfer: true
             };
-            return pool
+            var self = this;
+            pool
                 .transcode(buffer, config)
                 .then(function (result) {
                 var width = result.width;
@@ -902,10 +972,10 @@ var pixi_compressed_textures;
                 var srcBuffer = new Uint8Array(result.buffer);
                 var target = result.hasAlpha ? pixi_compressed_textures.BASISLoader.RGBA_FORMAT : pixi_compressed_textures.BASISLoader.RGB_FORMAT;
                 var name = target.name.replace("COMPRESSED_", "");
-                var dest = _this._image;
+                var dest = self._image;
                 _this._mips = result.mipmaps;
                 console.log("[WorkedBASISLoader] Total transcoding time:", performance.now() - start);
-                return dest.init(dest.src, srcBuffer, 'BASIS|' + name, width, height, 1, target.native);
+                dest.init(dest.src, srcBuffer, 'BASIS|' + name, width, height, 1, target.native);
             });
         };
         WorkedBASISLoader.loadAndRunTranscoder = function (options) {

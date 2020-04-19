@@ -79,7 +79,7 @@ namespace pixi_compressed_textures {
         [12 * 10]: 12,
         [12 * 12]: 13
     }
-    
+
     export class ASTCLoader extends AbstractInternalLoader {
         public static type = "ASTC";
         private _blockSize: { x: number; y: number } = { x: 0, y: 0 };
@@ -88,7 +88,7 @@ namespace pixi_compressed_textures {
             super(_image);
         }
 
-        load(buffer: ArrayBuffer) {
+        async load(buffer: ArrayBuffer) {
             if (!ASTCLoader.test(buffer)) {
                 // Do some sanity checks to make sure this is a valid ASTC file.
                 throw "Invalid magic number in ASTC header";
@@ -108,7 +108,7 @@ namespace pixi_compressed_textures {
 
             const dest = this._image;
             dest.init(dest.src, astcData, 'ASTC', width, height, 1, internalFormat);
-            return dest;
+            // return dest;
         }
 
         static test(buffer: ArrayBuffer) {

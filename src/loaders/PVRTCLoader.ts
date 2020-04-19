@@ -54,14 +54,14 @@ namespace pixi_compressed_textures {
         [PVR_FORMAT_DXT5] : COMPRESSED_RGBA_S3TC_DXT5_EXT
     } as {[key: number] : number};
 
-    export class PVRTCLoader extends AbstractInternalLoader {        
+    export class PVRTCLoader extends AbstractInternalLoader {
         public static type = "PVR";
 
         constructor(_image : CompressedImage) {
             super(_image);
         }
 
-        load(arrayBuffer: ArrayBuffer) {
+        async load(arrayBuffer: ArrayBuffer) {
             if (!PVRTCLoader.test(arrayBuffer)) {
                 // Do some sanity checks to make sure this is a valid ASTC file.
                 throw "Invalid magic number in PVR header";
@@ -82,11 +82,11 @@ namespace pixi_compressed_textures {
             const pvrtcData = new Uint8Array(arrayBuffer, dataOffset);
 
             const dest = this._image;
-            
+
             this._format = internalFormat;
             dest.init(dest.src, pvrtcData, 'PVR', width, height, levels, internalFormat);
 
-            return dest;
+            // return dest;
         }
 
         static test(buffer: ArrayBuffer) {
@@ -94,24 +94,24 @@ namespace pixi_compressed_textures {
             return magic[0] === PVR_MAGIC;
         }
 
-        levelBufferSize(width : number, height : number, mipLevel: number = 0): number {            
+        levelBufferSize(width : number, height : number, mipLevel: number = 0): number {
             switch (this._format) {
                 case COMPRESSED_RGB_S3TC_DXT1_EXT:
                 case COMPRESSED_RGB_ETC1_WEBGL:
                     return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
-    
+
                 case COMPRESSED_RGBA_S3TC_DXT3_EXT:
                 case COMPRESSED_RGBA_S3TC_DXT5_EXT:
                     return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
-    
+
                 case COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
                 case COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
                     return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
-    
+
                 case COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
                 case COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
                     return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
-    
+
                 default:
                     return 0;
             }

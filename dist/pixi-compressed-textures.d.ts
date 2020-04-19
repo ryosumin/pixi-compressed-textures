@@ -4,7 +4,6 @@ declare namespace PIXI {
     }
 }
 declare namespace PIXI.compressedTextures {
-    function loadFromArrayBuffer(arrayBuffer: ArrayBuffer, src: string, crnLoad?: boolean): CompressedImage;
     class CompressedImage extends PIXI.resources.Resource {
         private _internalLoader;
         constructor(src: string, data?: Uint8Array, type?: string, width?: number, height?: number, levels?: number, internalFormat?: number);
@@ -25,7 +24,7 @@ declare namespace PIXI.compressedTextures {
         bind(baseTexture: PIXI.BaseTexture): void;
         upload(renderer: PIXI.Renderer, baseTexture: PIXI.BaseTexture, glTexture: PIXI.GLTexture): boolean;
         style(renderer: PIXI.Renderer, baseTexture: PIXI.BaseTexture, glTexture: PIXI.GLTexture): boolean;
-        loadFromArrayBuffer(arrayBuffer: ArrayBuffer, crnLoad?: boolean): CompressedImage;
+        loadFromArrayBuffer(arrayBuffer: ArrayBuffer, crnLoad?: boolean): Promise<any>;
     }
 }
 declare namespace PIXI.systems {
@@ -66,7 +65,7 @@ declare namespace PIXI.compressedTextures {
     const TEXTURE_EXTENSIONS: string[];
     function RegisterCompressedExtensions(...exts: string[]): void;
     class ImageParser {
-        static use(this: PIXI.Loader, resource: PIXI.LoaderResource, next: () => any): void;
+        static use(this: PIXI.Loader, resource: PIXI.LoaderResource, next: () => any): Promise<void>;
     }
 }
 interface IBasicResult {
@@ -138,7 +137,7 @@ declare namespace PIXI.compressedTextures {
         protected _format: number;
         constructor(_image?: CompressedImage);
         abstract levelBufferSize(width: number, height: number, mipLevel?: number): number;
-        abstract load(buffer: ArrayBuffer): CompressedImage;
+        abstract load(buffer: ArrayBuffer): void;
         free(): void;
         static test(arrayBuffer: ArrayBuffer): boolean;
     }
@@ -149,7 +148,7 @@ declare namespace PIXI.compressedTextures {
         static type: string;
         private _blockSize;
         constructor(_image: CompressedImage, useSRGB?: boolean);
-        load(buffer: ArrayBuffer): CompressedImage;
+        load(buffer: ArrayBuffer): Promise<void>;
         static test(buffer: ArrayBuffer): boolean;
         levelBufferSize(width: number, height: number, mipLevel?: number): number;
     }
@@ -185,8 +184,8 @@ declare namespace PIXI.compressedTextures {
         constructor(_image: CompressedImage);
         static test(array: ArrayBuffer): boolean;
         static bindTranscoder(fileCtr: typeof BasisFile, ext: any): void;
-        load(buffer: ArrayBuffer): CompressedImage;
-        _loadAsync(buffer: ArrayBuffer): any;
+        load(buffer: ArrayBuffer): void;
+        _loadAsync(buffer: ArrayBuffer): void;
         _computeLevelBufferSize(_file: BasisFile, width: number, height: number, level: number): number;
         levelBufferSize(width: number, height: number, level: number): number;
     }
@@ -207,7 +206,7 @@ declare namespace PIXI.compressedTextures {
         static type: string;
         private _caches;
         constructor(_image: CompressedImage);
-        load(arrayBuffer: ArrayBuffer): CompressedImage;
+        load(arrayBuffer: ArrayBuffer): Promise<void>;
         levelBufferSize(width: number, height: number, mipLevel?: number): number;
         free(): void;
         static test(buffer: ArrayBuffer): boolean;
@@ -219,7 +218,7 @@ declare namespace PIXI.compressedTextures {
     class DDSLoader extends AbstractInternalLoader {
         static type: string;
         constructor(_image: CompressedImage);
-        load(arrayBuffer: ArrayBuffer): CompressedImage;
+        load(arrayBuffer: ArrayBuffer): Promise<void>;
         static test(buffer: ArrayBuffer): boolean;
         levelBufferSize(width: number, height: number, mipLevel?: number): number;
     }
@@ -228,7 +227,7 @@ declare namespace PIXI.compressedTextures {
     class PVRTCLoader extends AbstractInternalLoader {
         static type: string;
         constructor(_image: CompressedImage);
-        load(arrayBuffer: ArrayBuffer): CompressedImage;
+        load(arrayBuffer: ArrayBuffer): Promise<void>;
         static test(buffer: ArrayBuffer): boolean;
         levelBufferSize(width: number, height: number, mipLevel?: number): number;
     }
@@ -237,7 +236,7 @@ declare namespace PIXI.compressedTextures {
     class WorkedBASISLoader extends BASISLoader {
         private _mips;
         constructor(_image: CompressedImage);
-        _loadAsync(buffer: ArrayBuffer): any;
+        _loadAsync(buffer: ArrayBuffer): void;
         static loadAndRunTranscoder(options: {
             path: string;
             ext: any;

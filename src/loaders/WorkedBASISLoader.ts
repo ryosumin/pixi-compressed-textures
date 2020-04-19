@@ -19,24 +19,27 @@ namespace pixi_compressed_textures {
                 rgbFormat: BASISLoader.RGB_FORMAT.basis,
                 transfer: true
             };
+            let self = this;
 
-            return pool
-                .transcode(buffer, config)
-                .then( (result: ITranscodeResult ) => 
-                {
-                    const width = result.width;
-                    const height = result.height;
-                    const srcBuffer = new Uint8Array(result.buffer);
-                    const target = result.hasAlpha ? BASISLoader.RGBA_FORMAT : BASISLoader.RGB_FORMAT;
-                    const name = target.name.replace("COMPRESSED_", "");
-                    const dest = this._image;
+              pool
+                  .transcode(buffer, config)
+                  .then( (result: ITranscodeResult ) =>
+                  {
+                      const width = result.width;
+                      const height = result.height;
+                      const srcBuffer = new Uint8Array(result.buffer);
+                      const target = result.hasAlpha ? BASISLoader.RGBA_FORMAT : BASISLoader.RGB_FORMAT;
+                      const name = target.name.replace("COMPRESSED_", "");
+                      const dest = self._image;
 
-                    this._mips = result.mipmaps;
+                      this._mips = result.mipmaps;
 
-                    console.log("[WorkedBASISLoader] Total transcoding time:", performance.now() - start);
-                    return dest.init(dest.src, srcBuffer, 'BASIS|' + name, width, height, 1, target.native);
-                }
-            );
+                      console.log("[WorkedBASISLoader] Total transcoding time:", performance.now() - start);
+                      dest.init(dest.src, srcBuffer, 'BASIS|' + name, width, height, 1, target.native);
+                  }
+              );
+
+
         }
 
         static loadAndRunTranscoder(options: {path: string, ext: any, threads: number}) {
@@ -52,7 +55,7 @@ namespace pixi_compressed_textures {
 
         static runTranscoder(options: {jsSource: string, wasmSource: ArrayBuffer, threads: number, ext: any}) {
             const trans = new WorkedBASIS.TranscoderWorkerPool(options.threads || 2);
-            
+
             super.bindTranscoder(trans as any, options.ext);
 
             const idx = Loaders.indexOf(BASISLoader);
