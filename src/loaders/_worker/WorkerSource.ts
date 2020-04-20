@@ -1,10 +1,10 @@
-// @ts-nocheck 
+// @ts-nocheck
 declare var BASIS: any;
 
 namespace pixi_compressed_textures.WorkedBASIS {
 	export const basisWorkerSource = function () {
 		let _BasisFile : any;
-		function init (message : any) {
+		this.init = function (message : any) {
 			const bin = message.wasmBinary as ArrayBuffer;
 			__init (bin).then(()=>{
 				//@ts-ignore
@@ -12,7 +12,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
 			});
 		}
 
-		function transcode(message : any) {
+		this.transcode = function (message : any) {
 			try {
 				const res = __transcode( message.buffer, message.config);
 
@@ -38,10 +38,10 @@ namespace pixi_compressed_textures.WorkedBASIS {
 			}
 		};
 
-		function __init( wasmBinary: ArrayBuffer ) {
+		this.__init = function ( wasmBinary: ArrayBuffer ) {
 
 			let Module: any;
-			return new Promise( ( resolve ) => 
+			return new Promise( ( resolve ) =>
 			{
 				Module = { wasmBinary, onRuntimeInitialized: resolve };
 				return BASIS(Module);
@@ -54,7 +54,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
 			});
 		}
 
-		function __transcode( buffer : ArrayBuffer, config: any ) {
+		this.__transcode = function ( buffer : ArrayBuffer, config: any ) {
 			const basisFile = new _BasisFile( new Uint8Array( buffer ) );
 			const width = basisFile.getImageWidth( 0, 0 );
 			const height = basisFile.getImageHeight( 0, 0 );
@@ -79,7 +79,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
 			let totalSize = 0;
 			let offset = 0;
 			let targetBuffer = undefined;
-			
+
 			const mipmaps = [];
 			const target = hasAlpha ? config.rgbaFormat : config.rgbFormat;
 
@@ -87,7 +87,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
 				const mipWidth = basisFile.getImageWidth( 0, mip );
 				const mipHeight = basisFile.getImageHeight( 0, mip );
 				const size = basisFile.getImageTranscodedSizeInBytes( 0, mip, target );
-				
+
 				//calc total size of buffer for all mips
 				totalSize += size;
 				mipmaps.push( { width: mipWidth, height: mipHeight, format: target, size } );
@@ -110,7 +110,7 @@ namespace pixi_compressed_textures.WorkedBASIS {
 					cleanup();
 					throw '.transcodeImage failed.';
 				}
-				
+
 				offset += size;
 				//mipmaps[mip].data = dst;
 			}
@@ -124,8 +124,8 @@ namespace pixi_compressed_textures.WorkedBASIS {
 		let source = basisWorkerSource.toString();
 		const b0 = source.indexOf("{");
 		const b1 = source.lastIndexOf("}");
-	 
+
 		source = basisJSSource + "\n" + source.substring(b0 + 1, b1);
 		return new Worker(URL.createObjectURL(new Blob([source])));
-	} 
+	}
 }

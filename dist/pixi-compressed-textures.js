@@ -1213,13 +1213,13 @@ var pixi_compressed_textures;
     (function (WorkedBASIS) {
         WorkedBASIS.basisWorkerSource = function () {
             var _BasisFile;
-            function init(message) {
+            this.init = function (message) {
                 var bin = message.wasmBinary;
                 __init(bin).then(function () {
                     self.postMessage({ type: "init", status: true, buffer: bin }, [bin]);
                 });
-            }
-            function transcode(message) {
+            };
+            this.transcode = function (message) {
                 try {
                     var res = __transcode(message.buffer, message.config);
                     Object.assign(res, {
@@ -1231,7 +1231,7 @@ var pixi_compressed_textures;
                     console.error(error);
                     self.postMessage({ type: 'error', id: message.id, error: error.message });
                 }
-            }
+            };
             onmessage = function (e) {
                 var message = e.data;
                 var func = self[message.type];
@@ -1239,7 +1239,7 @@ var pixi_compressed_textures;
                     func(message);
                 }
             };
-            function __init(wasmBinary) {
+            this.__init = function (wasmBinary) {
                 var Module;
                 return new Promise(function (resolve) {
                     Module = { wasmBinary: wasmBinary, onRuntimeInitialized: resolve };
@@ -1249,8 +1249,8 @@ var pixi_compressed_textures;
                     _BasisFile = BasisFile;
                     initializeBasis();
                 });
-            }
-            function __transcode(buffer, config) {
+            };
+            this.__transcode = function (buffer, config) {
                 var basisFile = new _BasisFile(new Uint8Array(buffer));
                 var width = basisFile.getImageWidth(0, 0);
                 var height = basisFile.getImageHeight(0, 0);
@@ -1293,7 +1293,7 @@ var pixi_compressed_textures;
                 }
                 cleanup();
                 return { width: width, height: height, hasAlpha: hasAlpha, mipmaps: mipmaps, buffer: targetBuffer };
-            }
+            };
         };
         function generateWorker(basisJSSource) {
             var source = WorkedBASIS.basisWorkerSource.toString();
