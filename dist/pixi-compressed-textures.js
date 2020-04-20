@@ -966,7 +966,7 @@ var pixi_compressed_textures;
             var start = performance.now();
             var pool = pixi_compressed_textures.BASISLoader.BASIS_BINDING;
             var config = {
-                genMip: true,
+                genMip: false,
                 rgbaFormat: pixi_compressed_textures.BASISLoader.RGBA_FORMAT.basis,
                 rgbFormat: pixi_compressed_textures.BASISLoader.RGB_FORMAT.basis,
                 transfer: true

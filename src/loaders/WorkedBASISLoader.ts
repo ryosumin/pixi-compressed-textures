@@ -14,7 +14,8 @@ namespace pixi_compressed_textures {
             const pool: WorkedBASIS.TranscoderWorkerPool = BASISLoader.BASIS_BINDING as any;
 
             const config = {
-                genMip: true,
+                // genMip: true,
+                genMip: false,
                 rgbaFormat: BASISLoader.RGBA_FORMAT.basis,
                 rgbFormat: BASISLoader.RGB_FORMAT.basis,
                 transfer: true
